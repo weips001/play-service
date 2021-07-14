@@ -1,0 +1,30 @@
+{
+  "development": {
+    "username": "root",
+    "password": "Wps097200.+",
+    "database": "playplace",
+    "host": "39.99.228.79",
+    "dialect": "mysql"
+  },
+  "development1": {
+    "username": "root",
+    "password": "www.2020",
+    "database": "wps",
+    "host": "10.213.134.254",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "Wps097200.+",
+    "database": "play",
+    "host": "39.99.228.79",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
