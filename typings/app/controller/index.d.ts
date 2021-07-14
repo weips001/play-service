@@ -8,6 +8,7 @@ import ExportCommon = require('../../../app/controller/common');
 import ExportPlace = require('../../../app/controller/place');
 import ExportRole = require('../../../app/controller/role');
 import ExportRoleAuth = require('../../../app/controller/roleAuth');
+import ExportTaoRecharge = require('../../../app/controller/taoRecharge');
 import ExportUser = require('../../../app/controller/user');
 import ExportUserRole = require('../../../app/controller/userRole');
 import ExportVip = require('../../../app/controller/vip');
@@ -20,6 +21,7 @@ declare module 'egg' {
     place: ExportPlace;
     role: ExportRole;
     roleAuth: ExportRoleAuth;
+    taoRecharge: ExportTaoRecharge;
     user: ExportUser;
     userRole: ExportUserRole;
     vip: ExportVip;

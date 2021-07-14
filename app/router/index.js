@@ -23,6 +23,7 @@ module.exports = app => {
   require('./user')(app)
   require('./userRole')(app)
   require('./vip')(app)
+  require('./taoRecharge')(app)
   // require('./place')(app)
   // require('./student')(app)
   // require('./gameBi')(app)
