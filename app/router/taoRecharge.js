@@ -1,6 +1,7 @@
 module.exports = app => {
   const { router, controller } = app
-  // router.post('/api/vip/consume/:id', controller.vip.consume)
+  router.post('/api/taoRecharge/consume/:id', controller.taoRecharge.consume)
+  router.get('/api/getTaoRecharge', controller.taoRecharge.getTaoRecharge)
   router.resources('taoRecharge', '/api/taoRecharge', controller.taoRecharge)
 }
 // car, carManagement, addCar, editCar,

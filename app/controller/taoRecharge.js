@@ -64,6 +64,21 @@ class TaoRechargeController extends CommonController {
     const ctx = this.ctx
     ctx.body = await ctx.service.taoRecharge.destroy(ctx.params.id)
   }
+
+  async getTaoRecharge() {
+    const ctx = this.ctx
+    let { limit, offset, vipId } = this.getPageQuery()
+    const where = {
+      vipId
+    }
+    const query = {
+      limit,
+      offset,
+      where: this.wrapplaceId(where),
+      order: [['createdAt', 'Asc']]
+    }
+    ctx.body = await ctx.service.taoRecharge.getTaoRecharge(query)
+  }
 }
 
 module.exports = TaoRechargeController

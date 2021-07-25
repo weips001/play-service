@@ -7,7 +7,7 @@ class TaoRechargeService extends CommenService {
     const { ctx } = this
     const { limit, offset, phone, name, cardId, cardType, restTotal } = query
     const suffix = ' ORDER BY t.created_at DESC LIMIT ?,?'
-    let querySql = `SELECT t.*, v.name, v.phone, v.sex FROM tao_recharge t LEFT JOIN vip v ON t.vip_id = v.id where 1=1`
+    let querySql = `SELECT t.*, v.name, v.phone, v.sex, v.birthday FROM tao_recharge t LEFT JOIN vip v ON t.vip_id = v.id where 1=1`
     let whereStr = ''
     let countSql =
       'SELECT COUNT(*) AS total FROM tao_recharge t LEFT JOIN vip v ON t.vip_id = v.id where 1=1'
@@ -62,7 +62,7 @@ class TaoRechargeService extends CommenService {
     }
     return this.error(null, '无当前数据，获取详情失败')
   }
-
+  // 新建和充值的接口，根据手机号判断是否有当前会员，如果有直接绑定，如果没有就创建，再生成一条充值记录
   async create(placeId, body) {
     const { ctx, app } = this
     const { Op } = app.Sequelize
@@ -72,7 +72,11 @@ class TaoRechargeService extends CommenService {
         ...body,
         placeId
       }
-      const vip = await ctx.model.Vip.create(params, {
+      const [vip] = await ctx.model.Vip.findOrCreate({
+        where: {
+          phone: params.phone
+        },
+        defaults: params,
         fields: ['name', 'phone', 'remark', 'sex', 'birthday', 'placeId'],
         transaction: t
       })
@@ -161,12 +165,23 @@ class TaoRechargeService extends CommenService {
   }
 
   async destroy() {
+    const { ctx } = this
     const taoRecharge = await ctx.model.TaoRecharge.findByPk(ctx.params.id)
     if (taoRecharge) {
       await taoRecharge.destroy()
       return this.success(null, '删除成功')
     }
     return this.error(null, '删除失败，没有当前数据')
+  }
+  async getTaoRecharge(query) {
+    const { ctx } = this
+    const { count, rows } = await ctx.model.TaoRecharge.findAndCountAll(query)
+    const res = this.success(rows, '查询成功！')
+    return {
+      ...res,
+      total: count,
+      success: true
+    }
   }
 }
 

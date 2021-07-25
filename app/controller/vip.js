@@ -5,32 +5,37 @@ class VipController extends CommonController {
    */
   async index() {
     const ctx = this.ctx
-    let {
-      limit,
-      offset,
-      phone,
-      name,
-      cardId,
-      cardType,
-      restTotal
-    } = this.getPageQuery()
+    let { limit, offset, searchKey } = this.getPageQuery()
     const { Op } = this.app.Sequelize
     const where = {
-      phone: {
-        [Op.startsWith]: phone || ''
-      },
-      name: {
-        [Op.substring]: name || ''
-      },
-      cardId: {
-        [Op.startsWith]: cardId || ''
-      }
-    }
-    if (cardType != undefined) {
-      where.cardType = cardType
-    }
-    if (restTotal != undefined) {
-      where.restTotal = restTotal
+      [Op.or]: [
+        {
+          phone: {
+            [Op.startsWith]: searchKey || ''
+          }
+        },
+        {
+          name: {
+            [Op.substring]: searchKey || ''
+          }
+        }
+        // {
+        //   cardId: {
+        //     [Op.startsWith]: searchKey || ''
+        //   }
+        // }
+      ]
+      // [Op.or]: {
+      //   phone: {
+      //     [Op.startsWith]: phone || ''
+      //   },
+      //   name: {
+      //     [Op.substring]: name || ''
+      //   },
+      //   cardId: {
+      //     [Op.startsWith]: cardId || ''
+      //   }
+      // }
     }
     const query = {
       limit,
