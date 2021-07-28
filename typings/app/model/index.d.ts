@@ -8,6 +8,7 @@ import ExportPlace = require('../../../app/model/place');
 import ExportRole = require('../../../app/model/role');
 import ExportRoleAuth = require('../../../app/model/roleAuth');
 import ExportTaoRecharge = require('../../../app/model/taoRecharge');
+import ExportTaoRecord = require('../../../app/model/taoRecord');
 import ExportUser = require('../../../app/model/user');
 import ExportUserRole = require('../../../app/model/userRole');
 import ExportVip = require('../../../app/model/vip');
@@ -21,6 +22,7 @@ declare module 'egg' {
     Role: ReturnType<typeof ExportRole>;
     RoleAuth: ReturnType<typeof ExportRoleAuth>;
     TaoRecharge: ReturnType<typeof ExportTaoRecharge>;
+    TaoRecord: ReturnType<typeof ExportTaoRecord>;
     User: ReturnType<typeof ExportUser>;
     UserRole: ReturnType<typeof ExportUserRole>;
     Vip: ReturnType<typeof ExportVip>;

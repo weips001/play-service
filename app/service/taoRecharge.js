@@ -124,44 +124,73 @@ class TaoRechargeService extends CommenService {
 
   async consume(id, consumeNum) {
     const { ctx } = this
-    const taoRecharge = await ctx.model.TaoRecharge.findByPk(id)
-    if (taoRecharge) {
-      const { cardType, overdate, restTotal } = taoRecharge
-      // 判斷是否是年卡
-      if (cardType === '1') {
-        // 判斷是否過期
-        if (overdate) {
-          const canConsume = new Date(overdate) > new Date()
-          if (canConsume) {
-            // TODO: 這裡要增加當天是否已消費的判斷
-            const incrementResult = await taoRecharge.increment('usedTotal')
-            console.log(incrementResult)
-            // TODO:需要写入一条消费记录
-            return this.success(null, '消费成功，次数：1 次')
+    const t = await ctx.model.transaction()
+    try {
+      const taoRecharge = await ctx.model.TaoRecharge.findByPk(id, {
+        transaction: t
+      })
+      console.log(taoRecharge.toJSON())
+      if (taoRecharge) {
+        const {
+          cardType,
+          overdate,
+          restTotal,
+          cardId,
+          vipId,
+          placeId
+        } = taoRecharge
+        const taoRecordValue = {
+          consumeNum,
+          cardType,
+          cardId,
+          vipId,
+          placeId
+        }
+        // 判斷是否是年卡
+        if (cardType === '1') {
+          // 判斷是否過期
+          if (overdate) {
+            const canConsume = new Date(overdate) > new Date()
+            if (canConsume) {
+              // TODO: 這裡要增加當天是否已消費的判斷
+              const incrementResult = await taoRecharge.increment('usedTotal', {
+                transaction: t
+              })
+              await ctx.model.TaoRecord.saveRecord(taoRecordValue, t)
+              await t.commit()
+              console.log(incrementResult)
+              // TODO:需要写入一条消费记录
+              return this.success(null, '消费成功，次数：1 次')
+            }
+            return this.error(null, '会员卡已过期，不能消费')
           }
-          return this.error(null, '会员卡已过期，不能消费')
+          return this.error(null, '次卡无过期时间，不能消费')
         }
-        return this.error(null, '次卡无过期时间，不能消费')
-      }
-      // 次卡，因之前的次卡没有过期时间，这里先判断是否有过期时间
-      let conConsume = true
-      if (overdate) {
-        conConsume = new Date(overdate) > new Date()
-      }
-      if (conConsume) {
-        let diff = restTotal - consumeNum
-        if (diff < 0) {
-          return this.error(null, '次数不够用了，请充值')
+        // 次卡，因之前的次卡没有过期时间，这里先判断是否有过期时间
+        let conConsume = true
+        if (overdate) {
+          conConsume = new Date(overdate) > new Date()
         }
-        await taoRecharge.increment('usedTotal', { by: consumeNum })
-        await taoRecharge.decrement('restTotal', { by: consumeNum })
-        // TODO:需要写入一条消费记录
-        console.log(taoRecharge.toJSON())
-        return this.success(null, `消费成功，次数：${consumeNum} 次`)
+        if (conConsume) {
+          let diff = restTotal - consumeNum
+          if (diff < 0) {
+            return this.error(null, '次数不够用了，请充值')
+          }
+          await taoRecharge.increment('usedTotal', { by: consumeNum })
+          await taoRecharge.decrement('restTotal', { by: consumeNum })
+          await ctx.model.TaoRecord.saveRecord(taoRecordValue, t)
+          await t.commit()
+          // TODO:需要写入一条消费记录
+          console.log(taoRecharge.toJSON())
+          return this.success(null, `消费成功，次数：${consumeNum} 次`)
+        }
+        return this.error(null, '会员卡已过期，不能消费')
       }
-      return this.error(null, '会员卡已过期，不能消费')
+      return this.error(null, '沒有此會員無法消費')
+    } catch (e) {
+      await t.rollback()
+      return this.error(e, '消費失敗')
     }
-    return this.error(null, '沒有此會員無法消費')
   }
 
   async destroy() {
