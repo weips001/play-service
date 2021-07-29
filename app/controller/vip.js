@@ -75,6 +75,11 @@ class VipController extends CommonController {
     const ctx = this.ctx
     ctx.body = await ctx.service.vip.destroy(ctx.params.id)
   }
+  async getVipRecord() {
+    const ctx = this.ctx
+    const placeId = this.getPlaceId()
+    ctx.body = await ctx.service.vip.getVipRecord(placeId, ctx.query.vipId)
+  }
 }
 
 module.exports = VipController

@@ -6,31 +6,31 @@ class TaoRecordController extends CommonController {
   async index() {
     const ctx = this.ctx
     const query = this.getPageQuery()
-    let { limit, offset, phone, name, cardId, cardType, restTotal } = query
-    // const { Op } = this.app.Sequelize
-    // const where = {
-    //   // phone: {
-    //   //   [Op.startsWith]: phone || ''
-    //   // },
-    //   // name: {
-    //   //   [Op.substring]: name || ''
-    //   // },
-    //   cardId: {
-    //     [Op.startsWith]: cardId || ''
-    //   }
-    // }
-    // if (cardType != undefined) {
-    //   where.cardType = cardType
-    // }
-    // if (restTotal != undefined) {
-    //   where.restTotal = restTotal
-    // }
-    const query = {
-      limit,
-      offset,
-      where: this.wrapplaceId(where),
-      order: [['createdAt', 'DESC']]
+    let { limit, offset, vipId, name, cardId, cardType, restTotal } = query
+    const { Op } = this.app.Sequelize
+    const where = {
+      // phone: {
+      //   [Op.startsWith]: phone || ''
+      // },
+      // name: {
+      //   [Op.substring]: name || ''
+      // },
+      cardId: {
+        [Op.startsWith]: cardId || ''
+      }
     }
+    if (cardType != undefined) {
+      where.cardType = cardType
+    }
+    if (restTotal != undefined) {
+      where.restTotal = restTotal
+    }
+    // const query = {
+    //   limit,
+    //   offset,
+    //   where: this.wrapplaceId(where),
+    //   order: [['createdAt', 'DESC']]
+    // }
     ctx.body = await ctx.service.taoRecharge.list(query)
   }
 

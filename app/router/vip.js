@@ -1,6 +1,7 @@
 module.exports = app => {
   const { router, controller } = app
   router.post('/api/vip/consume/:id', controller.vip.consume)
+  router.get('/api/vip/getVipRecord', controller.vip.getVipRecord)
   router.resources('vip', '/api/vip', controller.vip)
 }
 // car, carManagement, addCar, editCar,

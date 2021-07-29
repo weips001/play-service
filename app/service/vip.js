@@ -117,6 +117,55 @@ class VipService extends CommenService {
     }
     return this.error(null, '删除失败，没有当前数据')
   }
+  async getVipRecord(placeId, vipId) {
+    const { ctx, app } = this
+    const { Op } = app.Sequelize
+    const getTaoConsume = ctx.model.TaoRecharge.findAll({
+      where: {
+        placeId,
+        vipId,
+        restTotal: {
+          [Op.or]: [
+            {
+              [Op.gt]: 0
+            },
+            {
+              [Op.eq]: -1
+            }
+          ]
+        },
+        overdate: {
+          [Op.gt]: new Date()
+        }
+      },
+      order: [['createdAt', 'ASC']]
+    })
+    const getTaoRecharge = ctx.model.TaoRecharge.findAll({
+      where: {
+        placeId,
+        vipId
+      },
+      order: [['createdAt', 'DESC']]
+    })
+    const getTaoRecord = ctx.model.TaoRecord.findAll({
+      where: {
+        placeId,
+        vipId
+      },
+      order: [['createdAt', 'DESC']]
+    })
+    const [consumeList, rechargeList, recordList] = await Promise.all([
+      getTaoConsume,
+      getTaoRecharge,
+      getTaoRecord
+    ])
+    const values = {
+      consumeList,
+      rechargeList,
+      recordList
+    }
+    return this.success(values, null)
+  }
 }
 
 module.exports = VipService
