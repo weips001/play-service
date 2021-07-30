@@ -154,15 +154,15 @@ class VipService extends CommenService {
       },
       order: [['createdAt', 'DESC']]
     })
-    const [consumeList, rechargeList, recordList] = await Promise.all([
+    const [consumeList, rechargeRecord, consumeRecord] = await Promise.all([
       getTaoConsume,
       getTaoRecharge,
       getTaoRecord
     ])
     const values = {
       consumeList,
-      rechargeList,
-      recordList
+      rechargeRecord,
+      consumeRecord
     }
     return this.success(values, null)
   }
