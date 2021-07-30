@@ -50,9 +50,9 @@ class VipService extends CommenService {
       ]
     })
     if (!vip) {
-      return this.error(null, '充值失败')
+      return this.error(null, '添加失败')
     }
-    return this.success(vip, '充值成功')
+    return this.success(vip, '添加成功')
   }
 
   async update(id, placeId, body) {
