@@ -31,7 +31,7 @@ class TaoRecordController extends CommonController {
     //   where: this.wrapplaceId(where),
     //   order: [['createdAt', 'DESC']]
     // }
-    ctx.body = await ctx.service.taoRecharge.list(query)
+    ctx.body = await ctx.service.taoRecord.list(query)
   }
 
   // async show() {

@@ -13,6 +13,7 @@ import ExportPlace = require('../../../app/service/place');
 import ExportRole = require('../../../app/service/role');
 import ExportRoleAuth = require('../../../app/service/roleAuth');
 import ExportTaoRecharge = require('../../../app/service/taoRecharge');
+import ExportTaoRecord = require('../../../app/service/taoRecord');
 import ExportUser = require('../../../app/service/user');
 import ExportUserRole = require('../../../app/service/userRole');
 import ExportVip = require('../../../app/service/vip');
@@ -26,6 +27,7 @@ declare module 'egg' {
     role: AutoInstanceType<typeof ExportRole>;
     roleAuth: AutoInstanceType<typeof ExportRoleAuth>;
     taoRecharge: AutoInstanceType<typeof ExportTaoRecharge>;
+    taoRecord: AutoInstanceType<typeof ExportTaoRecord>;
     user: AutoInstanceType<typeof ExportUser>;
     userRole: AutoInstanceType<typeof ExportUserRole>;
     vip: AutoInstanceType<typeof ExportVip>;

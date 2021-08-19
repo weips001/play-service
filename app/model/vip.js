@@ -21,13 +21,13 @@ module.exports = app => {
       }
     },
     phone: {
-      type: STRING(11),
+      type: STRING(12),
       allowNull: false,
       validate: {
-        is: {
-          args: /^[1][0-9]{10}$/,
-          msg: '手机格式不正确'
-        }
+        // is: {
+        //   args: /^[1][0-9]{10}$/,
+        //   msg: '手机格式不正确'
+        // }
       }
     },
     remark: {
@@ -54,8 +54,7 @@ module.exports = app => {
       validate: {
         notEmpty: {
           msg: '生日不能為空'
-        },
-        isBefore: dayjs().format('YYYY-MM-DD')
+        }
       }
     },
     // TODO:暂时没有校验

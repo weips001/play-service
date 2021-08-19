@@ -90,7 +90,7 @@ module.exports = app => {
     // TODO:暂时没有校验
     overdate: {
       type: DATE,
-      allowNull: false,
+      allowNull: true,
       comment: '过期时间'
     },
     vipId: {

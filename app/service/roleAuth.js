@@ -118,6 +118,18 @@ class RoleAuthService extends CommenService {
   }
   async getAuthFromRole(placeId, roleId) {
     const { ctx } = this
+    const role = await ctx.model.Role.findByPk(roleId)
+
+    if (role.roleCode === '-1') {
+      const authIds = await ctx.model.Auth.findAll({
+        where: {
+          authFlag: '-1'
+        },
+        attributes: ['id']
+      })
+      const res = authIds.map(auth => auth.id)
+      return this.success(res, null)
+    }
     let authIds = await ctx.model.RoleAuth.findAll({
       where: {
         placeId,

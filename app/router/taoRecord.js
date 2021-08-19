@@ -2,7 +2,7 @@ module.exports = app => {
   const { router, controller } = app
   // router.post('/api/taoRecharge/consume/:id', controller.taoRecharge.consume)
   // router.get('/api/getTaoRecharge', controller.taoRecharge.getTaoRecharge)
-  // router.resources('taoRecord', '/api/taoRecord', controller.taoRecord)
+  router.resources('taoRecord', '/api/taoRecord', controller.taoRecord)
 }
 // car, carManagement, addCar, editCar,
 // dict, studentSource

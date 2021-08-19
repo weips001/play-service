@@ -85,7 +85,7 @@ module.exports = app => {
     }
   })
   // 获取完整的用户信息，可以根据token或者id
-  User.getUser = async function(placeId, userId) {
+  User.getUser = async function (placeId, userId) {
     const where = {
       id: userId
     }
@@ -120,6 +120,17 @@ module.exports = app => {
       // const userRole = await app.model.RoleAuth.getUserRole(placeId, id)
       const roleIds = await app.model.UserRole.getRoleIds(placeId, id)
       const roleCodes = await app.model.Role.getRoleCodes(placeId, roleIds)
+      if (roleCodes.includes('-1')) {
+        const auth = await app.model.query(
+          'SELECT DISTINCT auth_code AS authCode FROM `auth` WHERE auth_flag = "-1"',
+          {
+            type: 'SELECT'
+          }
+        )
+        userInfo.auth = auth.map(item => item.authCode)
+        userInfo.role = roleCodes
+        return userInfo
+      }
       userInfo.role = roleCodes
       const auth = await app.model.RoleAuth.getAuthCodesFromRole(
         placeId,

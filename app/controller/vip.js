@@ -3,7 +3,7 @@ class VipController extends CommonController {
   /**
    * 可以根据手机号、姓名、卡号来查
    */
-  async index() {
+  async getVipBySearchKey() {
     const ctx = this.ctx
     let { limit, offset, searchKey } = this.getPageQuery()
     const { Op } = this.app.Sequelize
@@ -19,23 +19,27 @@ class VipController extends CommonController {
             [Op.substring]: searchKey || ''
           }
         }
-        // {
-        //   cardId: {
-        //     [Op.startsWith]: searchKey || ''
-        //   }
-        // }
       ]
-      // [Op.or]: {
-      //   phone: {
-      //     [Op.startsWith]: phone || ''
-      //   },
-      //   name: {
-      //     [Op.substring]: name || ''
-      //   },
-      //   cardId: {
-      //     [Op.startsWith]: cardId || ''
-      //   }
-      // }
+    }
+    const query = {
+      limit,
+      offset,
+      where: this.wrapplaceId(where),
+      order: [['createdAt', 'DESC']]
+    }
+    ctx.body = await ctx.service.vip.list(query)
+  }
+  async index() {
+    const ctx = this.ctx
+    let { limit, offset, phone, name } = this.getPageQuery()
+    const { Op } = this.app.Sequelize
+    const where = {
+      phone: {
+        [Op.startsWith]: phone || ''
+      },
+      name: {
+        [Op.substring]: name || ''
+      }
     }
     const query = {
       limit,
@@ -79,6 +83,15 @@ class VipController extends CommonController {
     const ctx = this.ctx
     const placeId = this.getPlaceId()
     ctx.body = await ctx.service.vip.getVipRecord(placeId, ctx.query.vipId)
+  }
+  async getDetailByPhone() {
+    const ctx = this.ctx
+    ctx.body = await ctx.service.vip.getDetailByPhone(ctx.query.phone)
+  }
+  async updateTime() {
+    const ctx = this.ctx
+    const placeId = this.getPlaceId()
+    ctx.body = await ctx.service.vip.updateTime(placeId, ctx.request.body)
   }
 }
 

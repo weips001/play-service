@@ -24,6 +24,7 @@ module.exports = app => {
   require('./userRole')(app)
   require('./vip')(app)
   require('./taoRecharge')(app)
+  require('./taoRecord')(app)
   // require('./place')(app)
   // require('./student')(app)
   // require('./gameBi')(app)

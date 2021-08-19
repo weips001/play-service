@@ -35,13 +35,13 @@ module.exports = app => {
     },
     cardType: {
       type: STRING(2),
-      allowNull: false,
+      allowNull: true,
       field: 'card_type',
       comment: '会员卡类型，0次卡 1时间卡',
       validate: {
-        notEmpty: {
-          msg: '会员卡类型不能為空'
-        },
+        // notEmpty: {
+        //   msg: '会员卡类型不能為空'
+        // },
         isIn: {
           args: [['0', '1']],
           msg: '无当前会员卡类型'
@@ -59,6 +59,9 @@ module.exports = app => {
         }
       }
     },
+    remark: {
+      type: STRING(255)
+    },
     // TODO:暂时没有校验
     placeId: {
       type: UUID,
@@ -72,9 +75,9 @@ module.exports = app => {
       }
     }
   })
-  TaoRecord.saveRecord = async function(data, t) {
+  TaoRecord.saveRecord = async function (data, t) {
     const options = {
-      fields: ['cardId', 'consumeNum', 'cardType', 'vipId', 'placeId']
+      fields: ['cardId', 'consumeNum', 'cardType', 'remark', 'vipId', 'placeId', 'createdAt']
     }
     if (t) {
       options.transaction = t

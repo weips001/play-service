@@ -2,15 +2,15 @@
 
 const CommenService = require('./common')
 
-class TaoRechargeService extends CommenService {
+class TaoRecordService extends CommenService {
   async list(query) {
     const { ctx } = this
-    const { limit, offset, phone, name, cardId, cardType, restTotal } = query
+    const { limit, offset, phone, name, cardId, consumeTime } = query
     const suffix = ' ORDER BY t.created_at DESC LIMIT ?,?'
-    let querySql = `SELECT t.*, v.name, v.phone, v.sex, v.birthday FROM tao_recharge t LEFT JOIN vip v ON t.vip_id = v.id where 1=1`
+    let querySql = `SELECT t.*, v.name, v.phone, v.sex, v.birthday FROM tao_record t LEFT JOIN vip v ON t.vip_id = v.id where 1=1`
     let whereStr = ''
     let countSql =
-      'SELECT COUNT(*) AS total FROM tao_recharge t LEFT JOIN vip v ON t.vip_id = v.id where 1=1'
+      'SELECT COUNT(*) AS total FROM tao_record t LEFT JOIN vip v ON t.vip_id = v.id where 1=1'
     let replacements = []
     if (name != undefined) {
       whereStr += ` AND v.name LIKE ? `
@@ -24,13 +24,9 @@ class TaoRechargeService extends CommenService {
       whereStr += ` AND t.card_id LIKE ? `
       replacements.push(`%${cardId}%`)
     }
-    if (cardType != undefined) {
-      whereStr += ` AND t.card_type = ? `
-      replacements.push(cardType)
-    }
-    if (restTotal != undefined) {
-      whereStr += ` AND t.rest_total = ? `
-      replacements.unshift(restTotal)
+    if (consumeTime != undefined) {
+      whereStr += ` AND TO_DAYS(t.created_at) = TO_DAYS(?) `
+      replacements.push(consumeTime)
     }
     countSql = countSql + whereStr
     querySql = querySql + whereStr + suffix
@@ -38,7 +34,7 @@ class TaoRechargeService extends CommenService {
     const rows = await ctx.model.query(querySql, {
       replacements,
       type: 'SELECT',
-      model: ctx.model.TaoRecharge,
+      model: ctx.model.TaoRecord,
       mapToModel: true
     })
     const { total } = await ctx.model.query(countSql, {
@@ -239,4 +235,4 @@ class TaoRechargeService extends CommenService {
   }
 }
 
-module.exports = TaoRechargeService
+module.exports = TaoRecordService

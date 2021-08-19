@@ -1,8 +1,7 @@
 'use strict'
 
 module.exports = options => {
-  return async function(ctx, next) {
-    console.log(1, options)
+  return async function (ctx, next) {
     const placeId = ctx.header['place-id']
     if (!placeId) {
       ctx.body = {

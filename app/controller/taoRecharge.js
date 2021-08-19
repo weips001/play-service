@@ -43,7 +43,13 @@ class TaoRechargeController extends CommonController {
   async create() {
     const ctx = this.ctx
     const placeId = this.getPlaceId()
-    ctx.body = await ctx.service.taoRecharge.create(placeId, ctx.request.body)
+    const body = ctx.request.body
+    if (body.total != undefined) {
+      body.restTotal = body.total
+      body.usedTotal = 0
+      body.isYearCard = body.cardType === '1'
+    }
+    ctx.body = await ctx.service.taoRecharge.create(placeId, body)
   }
 
   async update() {

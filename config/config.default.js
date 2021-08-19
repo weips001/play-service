@@ -20,12 +20,12 @@ module.exports = appInfo => {
   }
   exports.sequelize = {
     dialect: 'mysql',
-    // host: '39.99.228.79',
-    host: '127.0.0.1',
-    // username: 'root',
-    // password: 'Wps097200.+',
-    port: 3306,
-    database: 'wps',
+    host: '39.99.228.79',
+    // host: '127.0.0.1',
+    username: 'root',
+    password: 'Wps097200.+',
+    port: 3508,
+    database: 'play',
     timezone: '+08:00',
     define: {
       underscored: true,

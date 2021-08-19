@@ -30,29 +30,32 @@ class VipService extends CommenService {
       ...body,
       placeId
     }
-    const vip = await ctx.model.Vip.create(params, {
-      fields: [
-        'name',
-        'phone',
-        'isYearCard',
-        'cardId',
-        'cardType',
-        'money',
-        'total',
-        'restTotal',
-        'usedTotal',
-        'remark',
-        'sex',
-        'birthday',
-        'overdate',
-        'placeId',
-        'createdAt'
-      ]
-    })
-    if (!vip) {
-      return this.error(null, '添加失败')
+    try {
+      const [vip, created] = await ctx.model.Vip.findOrCreate({
+        where: {
+          phone: params.phone
+        },
+        defaults: params,
+        fields: [
+          'name',
+          'phone',
+          'remark',
+          'sex',
+          'birthday',
+          'placeId',
+          'createdAt'
+        ]
+      })
+      // console.log(vip.toJSON())
+      if (!created) {
+        return this.error(null, '会员手机号已存在！')
+      }
+      return this.success(vip, '添加成功')
+    } catch (e) {
+      console.log('e---', e)
+      return e
     }
-    return this.success(vip, '添加成功')
+
   }
 
   async update(id, placeId, body) {
@@ -135,7 +138,15 @@ class VipService extends CommenService {
           ]
         },
         overdate: {
-          [Op.gt]: new Date()
+          [Op.or]: [
+            {
+              [Op.gt]: new Date()
+            },
+            {
+              [Op.eq]: null
+            }
+          ]
+
         }
       },
       order: [['createdAt', 'ASC']]
@@ -165,6 +176,166 @@ class VipService extends CommenService {
       consumeRecord
     }
     return this.success(values, null)
+  }
+  async getDetailByPhone(phone) {
+    const { ctx } = this
+    const vip = await ctx.model.Vip.findOne({
+      where: {
+        phone
+      }
+    })
+    if (vip) {
+      return this.success(vip, '获取详情成功')
+    }
+    return this.error(null, '无当前数据，获取详情失败')
+  }
+  // 导入充值数据
+  async importRechargeInfo(ctx, placeId) {
+    const res = await ctx.http.get(`http://39.99.228.79:7006/api/vipBuyRecord?current=1&pageSize=5000`)
+
+    const { data, code } = res
+    let successNum = 0
+    let errNum = 0
+    if (code === 0) {
+      for (let i = 0; i < data.length; i++) {
+        let item = data[i]
+        const { money, isYearCard, restTotal, usedTotal, total, createTime, cardId, cardType, overdate } = item
+        // console.log(item)
+        const vip = await ctx.model.Vip.findOne({
+          where: {
+            phone: item.phone
+          }
+        })
+        if (vip) {
+          const values = {
+            money,
+            isYearCard,
+            restTotal,
+            usedTotal,
+            total,
+            createdAt: createTime,
+            cardId,
+            cardType,
+            overdate,
+            vipId: vip.id,
+
+          }
+          const res = await ctx.service.taoRecharge.create(placeId, values)
+          if (res.code === 0) {
+            successNum++
+          } else {
+            errNum++
+          }
+        }
+        const re = Math.floor((successNum + errNum) / data.length * 100) + '%'
+        console.log(re)
+
+      }
+      console.log(successNum, errNum)
+    }
+  }
+  // 导入消费记录
+  async importRecordInfo(ctx, placeId) {
+    const res = await ctx.http.get(`http://39.99.228.79:7006/api/shoppingRecord?current=1&pageSize=50000`)
+
+    const { data, code } = res
+    let successNum = 0
+    let errNum = 0
+    let noPhone = 0
+    let noVip = 0
+    if (code === 0) {
+      for (let i = 0; i < data.length; i++) {
+        let item = data[i]
+        const { consumeTime, cardId, cardType, phone, shoppingNum } = item
+        // console.log(item)
+        // if (!phone || !cardType) {
+        //   const {data, code} = await ctx.http.get(`http://39.99.228.79:7006/api/vipBuyRecord?current=1&pageSize=5000?cardId=${cardId}`)
+        //   data.filter(item => )
+        // }
+        if (phone) {
+          try {
+            const vip = await ctx.model.Vip.findOne({
+              where: {
+                phone
+              }
+            })
+            if (vip) {
+              const values = {
+                placeId,
+                createdAt: consumeTime,
+                cardId,
+                cardType,
+                consumeNum: shoppingNum,
+                vipId: vip.id,
+
+              }
+              const res = await ctx.model.TaoRecord.saveRecord(values)
+              if (res) {
+                successNum++
+              } else {
+                errNum++
+              }
+            } else {
+              ctx.logger.info('noVip---', JSON.stringify(item))
+              noVip++
+            }
+
+          } catch (e) {
+            console.log(e)
+            errNum++
+          }
+        } else {
+          noPhone++
+          ctx.logger.info('cardId---', item.cardId)
+        }
+
+        const re = Math.floor((successNum + errNum + noPhone + noVip) / data.length * 100) + '%'
+        console.log(re)
+
+      }
+      console.log(successNum, errNum, noPhone, noVip)
+    }
+  }
+  async changeCardType() {
+    const { ctx } = this
+    let changeNum = 0
+    try {
+      const res = await ctx.http.get(`http://39.99.228.79:7006/api/vipBuyRecord?current=1&pageSize=5000`)
+      const { code, data } = res
+      if (code === 0) {
+        for (let i = 0; i < data.length; i++) {
+          const item = data[i]
+          if (item.cardId != undefined) {
+            const list = await ctx.model.TaoRecord.findAll({
+              where: {
+                cardId: item.cardId
+              }
+            })
+            for (let j = 0; j < list.length; j++) {
+              const li = list[j]
+              if (li.cardType == undefined) {
+                li.cardType = item.cardType
+                const liRes = await li.save()
+                if (liRes) {
+                  changeNum++
+                }
+              }
+            }
+          }
+          const re = Math.floor(changeNum / 24866 * 100) + '%'
+          console.log(re)
+        }
+        console.log('changeNum', changeNum)
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  async updateTime(placeId, body) {
+    const { ctx } = this
+    // this.importRechargeInfo(ctx, placeId)
+    // await this.importRecordInfo(ctx, placeId)
+    await this.changeCardType()
   }
 }
 
