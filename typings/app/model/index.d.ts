@@ -4,6 +4,7 @@
 import 'egg';
 import ExportAdmin = require('../../../app/model/admin');
 import ExportAuth = require('../../../app/model/auth');
+import ExportGameBi = require('../../../app/model/gameBi');
 import ExportPlace = require('../../../app/model/place');
 import ExportRole = require('../../../app/model/role');
 import ExportRoleAuth = require('../../../app/model/roleAuth');
@@ -18,6 +19,7 @@ declare module 'egg' {
   interface IModel {
     Admin: ReturnType<typeof ExportAdmin>;
     Auth: ReturnType<typeof ExportAuth>;
+    GameBi: ReturnType<typeof ExportGameBi>;
     Place: ReturnType<typeof ExportPlace>;
     Role: ReturnType<typeof ExportRole>;
     RoleAuth: ReturnType<typeof ExportRoleAuth>;

@@ -5,6 +5,7 @@ import 'egg';
 import ExportAdmin = require('../../../app/controller/admin');
 import ExportAuth = require('../../../app/controller/auth');
 import ExportCommon = require('../../../app/controller/common');
+import ExportGameBiRecharge = require('../../../app/controller/gameBiRecharge');
 import ExportPlace = require('../../../app/controller/place');
 import ExportRole = require('../../../app/controller/role');
 import ExportRoleAuth = require('../../../app/controller/roleAuth');
@@ -19,6 +20,7 @@ declare module 'egg' {
     admin: ExportAdmin;
     auth: ExportAuth;
     common: ExportCommon;
+    gameBiRecharge: ExportGameBiRecharge;
     place: ExportPlace;
     role: ExportRole;
     roleAuth: ExportRoleAuth;
