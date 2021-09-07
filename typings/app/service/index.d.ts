@@ -9,6 +9,7 @@ type AutoInstanceType<T, U = T extends CanExportFunc ? T : T extends AnyFunc ? R
 import ExportAdmin = require('../../../app/service/admin');
 import ExportAuth = require('../../../app/service/auth');
 import ExportCommon = require('../../../app/service/common');
+import ExportFinance = require('../../../app/service/finance');
 import ExportPlace = require('../../../app/service/place');
 import ExportRole = require('../../../app/service/role');
 import ExportRoleAuth = require('../../../app/service/roleAuth');
@@ -23,6 +24,7 @@ declare module 'egg' {
     admin: AutoInstanceType<typeof ExportAdmin>;
     auth: AutoInstanceType<typeof ExportAuth>;
     common: AutoInstanceType<typeof ExportCommon>;
+    finance: AutoInstanceType<typeof ExportFinance>;
     place: AutoInstanceType<typeof ExportPlace>;
     role: AutoInstanceType<typeof ExportRole>;
     roleAuth: AutoInstanceType<typeof ExportRoleAuth>;

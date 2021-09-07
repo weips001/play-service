@@ -11,7 +11,7 @@ module.exports = app => {
   // router.get('/api/init', controller.init.init);
   // router.get('/api/shoppingRecord', controller.shoppingRecord.list);
   // router.get('/api/gameBiRecord', controller.gameBiRecord.list);
-  // router.post('/api/uploadConsumeRecord', controller.shoppingRecord.uploadFile);
+  router.post('/checkFile', controller.checkFile.uploadFile);
 
   // require('./role')(app);
   // require('./user')(app);
@@ -25,6 +25,7 @@ module.exports = app => {
   require('./vip')(app)
   require('./taoRecharge')(app)
   require('./taoRecord')(app)
+  require('./finance')(app)
   // require('./place')(app)
   // require('./student')(app)
   // require('./gameBi')(app)
