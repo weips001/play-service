@@ -25,40 +25,48 @@ class FinanceService extends CommenService {
 
   async create(placeId, body) {
     const { ctx, app } = this
-    const { Op } = app.Sequelize
+    const { Sequelize } = app
+    const { Op, where } = Sequelize
     const params = {
       ...body,
       placeId
     }
     try {
-      const finance = await ctx.model.Finance.create(params, {
-        fields: [
-          'totalMoney',
-          'personNum',
-          'cashMoney',
-          'paidMoney',
-          'paidDesc',
-          'placeId'
-        ]
-      })
-      // const [finance, created] = await ctx.model.Finance.findOrCreate({
-      //   where: {
-      //     phone: params.phone
-      //   },
-      //   defaults: params,
+      // const finance = await ctx.model.Finance.create(params, {
       //   fields: [
       //     'totalMoney',
       //     'personNum',
       //     'cashMoney',
       //     'paidMoney',
       //     'paidDesc',
-      //     'placeId'
+      //     'placeId',
+      //     "createdAt"
       //   ]
       // })
-      // console.log(finance.toJSON())
-      // if (!created) {
-      //   return this.error(null, '会员手机号已存在！')
-      // }
+      const [finance, created] = await ctx.model.Finance.findOrCreate({
+        where: {
+          [Op.and]: [
+            where(
+              Sequelize.fn('DATE', Sequelize.col('created_at')), // 表对应的字段
+              Sequelize.literal('CURRENT_DATE')
+            )
+          ]
+        },
+        defaults: params,
+        fields: [
+          'totalMoney',
+          'personNum',
+          'cashMoney',
+          'paidMoney',
+          'paidDesc',
+          'placeId',
+          "createdAt"
+        ]
+      })
+      console.log(finance.toJSON())
+      if (!created) {
+        return this.error(null, '当天账目已存在！')
+      }
       return this.success(finance, '添加成功')
     } catch (e) {
       console.log('e---', e)
@@ -86,6 +94,7 @@ class FinanceService extends CommenService {
   }
 
   async destroy() {
+    const { ctx } = this
     const finance = await ctx.model.Finance.findByPk(ctx.params.id)
     if (finance) {
       await finance.destroy()
