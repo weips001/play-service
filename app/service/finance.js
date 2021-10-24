@@ -43,12 +43,13 @@ class FinanceService extends CommenService {
       //     "createdAt"
       //   ]
       // })
+      const currentDate = params.createdAt ? params.createdAt : Sequelize.literal('CURRENT_DATE')
       const [finance, created] = await ctx.model.Finance.findOrCreate({
         where: {
           [Op.and]: [
             where(
               Sequelize.fn('DATE', Sequelize.col('created_at')), // 表对应的字段
-              Sequelize.literal('CURRENT_DATE')
+              currentDate
             )
           ]
         },
@@ -65,12 +66,11 @@ class FinanceService extends CommenService {
       })
       console.log(finance.toJSON())
       if (!created) {
-        return this.error(null, '当天账目已存在！')
+        return this.error(null, '所选日期账目已存在！')
       }
       return this.success(finance, '添加成功')
     } catch (e) {
-      console.log('e---', e)
-      return e
+      return Promise.reject(e)
     }
 
   }
@@ -101,6 +101,30 @@ class FinanceService extends CommenService {
       return this.success(null, '删除成功')
     }
     return this.error(null, '删除失败，没有当前数据')
+  }
+  async getFinanceByDate(placeId, body) {
+    const { ctx } = this
+    const { startDate = new Date(), endDate = new Date() } = body
+    const sql = `SELECT
+      SUM( total_money ) AS totalMoney,
+      SUM( person_num ) AS personNum,
+      SUM( paid_money ) AS paidMoney 
+    FROM
+      finance 
+    WHERE
+      place_id = :placeId 
+      AND DATE_FORMAT( created_at, '%Y-%m-%d' ) >= DATE_FORMAT( :startDate, '%Y-%m-%d' )
+      AND DATE_FORMAT( created_at, '%Y-%m-%d' ) <= DATE_FORMAT( :endDate, '%Y-%m-%d' );`
+    const res = await ctx.model.query(sql, {
+      replacements: {
+        placeId,
+        startDate,
+        endDate
+      },
+      type: 'SELECT',
+      plain: true
+    })
+    return this.success(res, '查询成功！')
   }
 }
 

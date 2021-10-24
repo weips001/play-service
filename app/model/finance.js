@@ -1,7 +1,7 @@
 'use strict'
 const uuid = require('uuid').v4
 module.exports = app => {
-  const { STRING, INTEGER, DATE, UUID } = app.Sequelize
+  const { STRING, FLOAT, DATE, UUID } = app.Sequelize
   const Finance = app.model.define('finance', {
     id: {
       type: UUID,
@@ -11,7 +11,7 @@ module.exports = app => {
       }
     },
     totalMoney: {
-      type: INTEGER,
+      type: FLOAT,
       allowNull: false,
       field: 'total_money',
       comment: '总收入',
@@ -22,7 +22,7 @@ module.exports = app => {
       }
     },
     personNum: {
-      type: INTEGER,
+      type: FLOAT,
       allowNull: false,
       field: 'person_num',
       comment: '人数',
@@ -33,7 +33,7 @@ module.exports = app => {
       }
     },
     cashMoney: {
-      type: INTEGER,
+      type: FLOAT,
       allowNull: false,
       field: 'cash_money',
       comment: '钱柜金额',
@@ -44,24 +44,27 @@ module.exports = app => {
       }
     },
     paidMoney: {
-      type: INTEGER,
+      type: FLOAT,
       allowNull: false,
       field: 'paid_money',
       comment: '支出金额',
       validate: {
         notEmpty: {
           msg: '支出金额不能為空'
-        }
+        },
       }
     },
     paidDesc: {
       type: STRING(300),
-      comment: '角色描述',
+      comment: '支出描述',
       field: 'paid_desc',
-      allowNull: false,
       validate: {
-        notEmpty: {
-          msg: '角色描述不能為空'
+        checkDesc(value) {
+          if (this.paidMoney > 0) {
+            if (value == undefined || !value) {
+              throw new Error("当有支出金额时，描述不能为空")
+            }
+          }
         }
       }
     },

@@ -51,6 +51,29 @@ module.exports = appInfo => {
     fileExtensions: ['.xls', '.xlsx']
   }
 
+  config.onerror = {
+    json(err, ctx) {
+      console.log(err)
+      const { errors = [], name } = err
+      if (name === 'SequelizeValidationError') {
+        ctx.body = {
+          code: 1,
+          data: null,
+          msg: errors[0] && errors[0].message || '验证异常'
+        }
+        ctx.status = 200
+        return
+      }
+      // json hander
+      ctx.body = {
+        code: 1,
+        data: null,
+        msg: '服务器异常'
+      };
+      ctx.status = 500;
+    },
+  }
+
   config.cors = {
     origin: '*',
     allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH'

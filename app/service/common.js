@@ -35,6 +35,7 @@ class CommonService extends Service {
   success(data, msg = null) {
     return {
       code: 0,
+      success: true,
       data,
       msg
     }
@@ -43,6 +44,7 @@ class CommonService extends Service {
   error(data = null, msg) {
     return {
       code: 1,
+      success: false,
       data,
       msg
     }
