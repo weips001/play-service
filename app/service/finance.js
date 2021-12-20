@@ -1,7 +1,7 @@
 'use strict'
 
 const CommenService = require('./common')
-
+const dayjs = require('dayjs')
 class FinanceService extends CommenService {
   async list(query) {
     const { ctx } = this
@@ -123,6 +123,32 @@ class FinanceService extends CommenService {
       },
       type: 'SELECT',
       plain: true
+    })
+    return this.success(res, '查询成功！')
+  }
+  async getFinanceByYear(placeId, body) {
+    const { ctx } = this
+    let { currentYear } = body
+    currentYear = dayjs(currentYear).format('YYYY')
+    const sql = `SELECT
+      SUM( total_money ) AS totalMoney,
+      SUM( person_num ) AS personNum,
+      SUM( paid_money ) AS paidMoney,
+      DATE_FORMAT( created_at, '%Y-%m' ) AS date 
+    FROM
+      finance 
+    WHERE
+      place_id = :placeId 
+      AND created_at >= :currentYear 
+    GROUP BY
+      DATE_FORMAT( created_at, '%Y-%m' )
+      ORDER BY date ASC`
+    const res = await ctx.model.query(sql, {
+      replacements: {
+        placeId,
+        currentYear
+      },
+      type: 'SELECT'
     })
     return this.success(res, '查询成功！')
   }

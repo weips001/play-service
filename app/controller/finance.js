@@ -50,6 +50,12 @@ class FinanceController extends CommonController {
     const placeId = this.getPlaceId()
     ctx.body = await ctx.service.finance.getFinanceByDate(placeId, ctx.request.body)
   }
+  async getFinanceByYear() {
+    const ctx = this.ctx
+    const placeId = this.getPlaceId()
+    ctx.body = await ctx.service.finance.getFinanceByYear(placeId, ctx.request.body)
+  }
+
 }
 
 module.exports = FinanceController
